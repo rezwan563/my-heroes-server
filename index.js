@@ -31,10 +31,9 @@ async function run() {
     // To get all toys
 
     app.get('/all_toys', async(req, res) =>{
-      console.log(req.query.email)
       let query = {}
       if(req.query?.email){
-        
+        query = {sellerEmail: req.query.email}
       }
         const result = await toysCollection.find(query).toArray()
         res.send(result);
