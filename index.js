@@ -26,6 +26,12 @@ async function run() {
 
     const toysCollection = client.db("toyStoreDB").collection("toys");
 
+
+    const indexKeys = {toyName: 1}
+    const indexOptions = {name: 'toyNames'}
+
+    const result = await toysCollection.createIndex(indexKeys, indexOptions)
+
     // To get all toys
 
     app.get("/all_toys", async (req, res) => {
@@ -40,6 +46,16 @@ async function run() {
       const result = await toysCollection.find(query).toArray();
       res.send(result);
     });
+
+    // Search toy by name
+
+    app.get('/toys/:name', async(req, res)=>{
+      const searchText = req.params.name;
+      console.log(searchText);
+      const result = await toysCollection.find({toyName: {$regex: searchText, $options: 'i'}}).toArray()
+      res.send(result)
+
+    })
 
     // For displaying single toy details
 
