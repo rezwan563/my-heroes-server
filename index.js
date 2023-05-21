@@ -52,10 +52,10 @@ async function run() {
 
     app.get("/toys/:name", async (req, res) => {
       const searchText = req.params.name;
-      console.log(searchText);
       const result = await toysCollection
         .find({ toyName: { $regex: searchText, $options: "i" } })
         .toArray();
+        
       res.send(result);
     });
 
@@ -93,6 +93,21 @@ async function run() {
       const result = await toysCollection.insertOne(newToy);
       res.send(result);
     });
+
+    // Update toy information
+
+    app.put('/all_toys/:id', async(req, res)=>{
+      const id = req.params.id;
+      const updateInfo = req.body;
+
+      console.log(id, updateInfo);
+      const filter = {_id: new ObjectId(id)}
+      const updatedDoc = {
+        $set: updateInfo
+      }
+      const result = await toysCollection.updateOne(filter, updatedDoc)
+      res.send(result)
+    })
 
     // Delete toy data from my toy page
 
