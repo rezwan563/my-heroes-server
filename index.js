@@ -32,6 +32,7 @@ async function run() {
       console.log(req.query);
       let query = {};
       let sortedBy = {};
+      let limit = 20;
       if (req.query?.email) {
         query = { sellerEmail: req.query.email };
       }
@@ -48,6 +49,17 @@ async function run() {
       const result = await toysCollection.find(query).toArray();
       res.send(result);
     });
+
+    // category wise data display
+
+    app.get('/sub_category/:category', async(req, res) =>{
+        const category = req.params.category;
+        console.log(category)
+        if(category === "Avengers" || category === "Transformers" || category === "Star trek"){
+          const result = await toysCollection.find({subCategory: category}).toArray()
+          return res.send(result)
+        }
+    })
 
     // Adding data to database
 
