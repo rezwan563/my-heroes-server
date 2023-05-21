@@ -26,36 +26,38 @@ async function run() {
 
     const toysCollection = client.db("toyStoreDB").collection("toys");
 
+    const indexKeys = { toyName: 1 };
+    const indexOptions = { name: "toyNames" };
 
-    const indexKeys = {toyName: 1}
-    const indexOptions = {name: 'toyNames'}
-
-    const result = await toysCollection.createIndex(indexKeys, indexOptions)
+    const result = await toysCollection.createIndex(indexKeys, indexOptions);
 
     // To get all toys
 
     app.get("/all_toys", async (req, res) => {
-      console.log(req.query);
       let query = {};
       let sortedBy = {};
       let limit = 20;
       if (req.query?.email) {
         query = { sellerEmail: req.query.email };
       }
+      if (req.query?.sort && req.query.sort !== NaN) {
+          sortedBy = { price: parseInt(req.query.sort) };
+      }
 
-      const result = await toysCollection.find(query).toArray();
+      const result = await toysCollection.find(query).sort(sortedBy).toArray();
       res.send(result);
     });
 
     // Search toy by name
 
-    app.get('/toys/:name', async(req, res)=>{
+    app.get("/toys/:name", async (req, res) => {
       const searchText = req.params.name;
       console.log(searchText);
-      const result = await toysCollection.find({toyName: {$regex: searchText, $options: 'i'}}).toArray()
-      res.send(result)
-
-    })
+      const result = await toysCollection
+        .find({ toyName: { $regex: searchText, $options: "i" } })
+        .toArray();
+      res.send(result);
+    });
 
     // For displaying single toy details
 
@@ -68,14 +70,20 @@ async function run() {
 
     // category wise data display
 
-    app.get('/sub_category/:category', async(req, res) =>{
-        const category = req.params.category;
-        console.log(category)
-        if(category === "Avengers" || category === "Transformers" || category === "Star trek"){
-          const result = await toysCollection.find({subCategory: category}).toArray()
-          return res.send(result)
-        }
-    })
+    app.get("/sub_category/:category", async (req, res) => {
+      const category = req.params.category;
+      console.log(category);
+      if (
+        category === "Avengers" ||
+        category === "Transformers" ||
+        category === "Star trek"
+      ) {
+        const result = await toysCollection
+          .find({ subCategory: category })
+          .toArray();
+        return res.send(result);
+      }
+    });
 
     // Adding data to database
 
